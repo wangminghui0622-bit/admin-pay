@@ -1,0 +1,42 @@
+Name: pay.rpc
+ListenOn: 0.0.0.0:9216
+
+Log:
+  ServiceName: payRpcLogger
+  Mode: console
+  Level: info
+
+DatabaseDSN: root:@tcp(127.0.0.1:3306)/admin_zero?charset=utf8mb4&parseTime=True&loc=Local&multiStatements=true
+
+RedisConf:
+  Host: 127.0.0.1:6379
+  Type: node
+  Pass:
+
+AsynqConf:
+  Addr: 127.0.0.1:6379
+  DB: 0
+  Enable: true
+
+PayProperties:
+  OrderNotifyUrl: ""
+  RefundNotifyUrl: ""
+  OrderNoPrefix: "P"
+  RefundNoPrefix: "R"
+
+AliPayConfig:
+  AppId: ""
+  SignType: RSA2
+  PrivateKey: ""
+  Status: false
+  AppPublicContentPath: "cert/alipay/appPublicCert.crt"
+  AlipayPublicContentRSA2Path: "cert/alipay/alipayPublicCert.crt"
+  AlipayRootContentPath: "cert/alipay/alipayRootCert.crt"
+
+WxPayConfig:
+  AppId: ""
+  MchId: ""
+  SerialNumber: ""
+  ApiV3Key: ""
+  Status: false
+  PrivateKeyContentPath: "cert/wechat/apiclient_key.pem"

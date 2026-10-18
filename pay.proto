@@ -1,0 +1,263 @@
+syntax = "proto3";
+
+package pay;
+
+option go_package = "./pay";
+
+// ---------- base ----------
+message Empty {}
+
+message BaseResp {
+  string msg = 1;
+}
+
+message BaseIDResp {
+  uint64 id = 1;
+  string msg = 2;
+}
+
+message IDReq {
+  uint64 id = 1;
+}
+
+// ---------- enums ----------
+enum PayStatus {
+  PAY_STATUS_UNKNOWN = 0;
+  PAY_WAITING = 1;
+  PAY_SUCCESS = 2;
+  PAY_REFUND = 3;
+  PAY_CLOSED = 4;
+  PAY_FAILURE = 5;
+}
+
+enum PayChannel {
+  ChannelUnknown = 0;
+  WxPub = 1;
+  WxLite = 2;
+  WxApp = 3;
+  WxNative = 4;
+  AlipayPc = 5;
+  AlipayWap = 6;
+  AlipayQr = 7;
+  AlipayBar = 8;
+}
+
+// ---------- order ----------
+message OrderCreateReq {
+  string user_ip = 1;
+  string merchant_order_id = 2;
+  string subject = 3;
+  string body = 4;
+  int32 price = 5;
+  int64 expire_time = 6; // unix 秒
+}
+
+message OrderInfo {
+  optional uint64 id = 1;
+  optional int64 created_at = 2; // unix 毫秒
+  optional int64 updated_at = 3; // unix 毫秒
+  optional uint32 status = 4;
+  optional string channel_code = 5;
+  optional string merchant_order_id = 6;
+  optional string subject = 7;
+  optional string body = 8;
+  optional int32 price = 9;
+  optional double channel_fee_rate = 10;
+  optional int32 channel_fee_price = 11;
+  optional string user_ip = 12;
+  optional int64 expire_time = 13; // unix 毫秒
+  optional int64 success_time = 14; // unix 毫秒
+  optional int64 notify_time = 15; // unix 毫秒
+  optional uint64 extension_id = 16;
+  optional string no = 17;
+  optional int32 refund_price = 18;
+  optional string channel_user_id = 19;
+  optional string channel_order_no = 20;
+}
+
+message OrderPageReq {
+  uint64 page = 1;
+  uint64 page_size = 2;
+  optional string channel_code = 3;
+  optional string merchant_order_id = 4;
+  optional string channel_order_no = 5;
+  optional string no = 6;
+  optional uint32 status = 7;
+  repeated int64 create_time = 8; // unix 秒 [start, end]
+}
+
+message OrderListResp {
+  uint64 total = 1;
+  repeated OrderInfo data = 2;
+}
+
+message OrderCreateExtensionReq {
+  uint64 order_id = 1;
+  string channel_code = 2;
+  map<string, string> channel_extras = 3;
+  string no = 4;
+  string user_ip = 5;
+}
+
+message OrderExtensionInfo {
+  optional uint64 id = 1;
+  optional int64 created_at = 2; // unix 毫秒
+  optional int64 updated_at = 3; // unix 毫秒
+  optional uint32 status = 4;
+  optional string no = 5;
+  optional uint64 order_id = 6;
+  optional string channel_code = 7;
+  optional string user_ip = 8;
+  map<string, string> channel_extras = 9;
+  optional string channel_error_code = 10;
+  optional string channel_error_msg = 11;
+  optional string channel_notify_data = 12;
+}
+
+message OrderSubmitReq {
+  uint64 id = 1;
+  string channel_code = 2;
+  map<string, string> channel_extras = 3;
+  string display_mode = 4;
+  string return_url = 5;
+  string user_ip = 6;
+}
+
+message OrderSubmitResp {
+  uint32 status = 1;
+  optional string display_mode = 2;
+  optional string display_content = 3;
+}
+
+message NotifyOrderReq {
+  bytes r = 1;
+  string code = 2;
+}
+
+// ---------- refund ----------
+message RefundCreateReq {
+  string user_ip = 1;
+  string merchant_order_id = 2;
+  string merchant_refund_id = 3;
+  string reason = 4;
+  int32 price = 5;
+}
+
+message RefundInfo {
+  optional uint64 id = 1;
+  optional int64 created_at = 2; // unix 毫秒
+  optional int64 updated_at = 3; // unix 毫秒
+  optional uint32 status = 4;
+  optional string no = 5;
+  optional string channel_code = 6;
+  optional uint64 order_id = 7;
+  optional string order_no = 8;
+  optional string merchant_order_id = 9;
+  optional string merchant_refund_id = 10;
+  optional int32 pay_price = 11;
+  optional int32 refund_price = 12;
+  optional string reason = 13;
+  optional string user_ip = 14;
+  optional string channel_order_no = 15;
+  optional string channel_refund_no = 16;
+  optional int64 success_time = 17; // unix 毫秒
+  optional string channel_error_code = 18;
+  optional string channel_error_msg = 19;
+  optional string channel_notify_data = 20;
+}
+
+message RefundPageReq {
+  uint64 page = 1;
+  uint64 page_size = 2;
+  optional string channel_code = 3;
+  optional string merchant_order_id = 4;
+  optional string merchant_refund_id = 5;
+  optional string channel_order_no = 6;
+  optional string channel_refund_no = 7;
+  optional uint32 status = 8;
+  repeated int64 create_time = 9; // unix 秒 [start, end]
+}
+
+message RefundPageResp {
+  uint64 total = 1;
+  repeated RefundInfo data = 2;
+}
+
+message NotifyRefundReq {
+  string channel_code = 1;
+  bytes r = 2;
+}
+
+// ---------- demo ----------
+message PayDemoOrderCreateReq {
+  string user_id = 1;
+  uint64 spu_id = 2;
+  string user_ip = 3;
+}
+
+message DemoOrderInfo {
+  optional uint64 id = 1;
+  optional int64 created_at = 2; // unix 毫秒
+  optional int64 updated_at = 3; // unix 毫秒
+  optional string user_id = 4;
+  optional uint64 spu_id = 5;
+  optional string spu_name = 6;
+  optional int32 price = 7;
+  optional bool pay_status = 8;
+  optional uint64 pay_order_id = 9;
+  optional int64 pay_time = 10; // unix 毫秒
+  optional string pay_channel_code = 11;
+  optional uint64 pay_refund_id = 12;
+  optional int32 refund_price = 13;
+  optional int64 refund_time = 14; // unix 毫秒
+}
+
+message DemoOrderPageReq {
+  uint64 page = 1;
+  uint64 page_size = 2;
+}
+
+message DemoOrderListResp {
+  uint64 total = 1;
+  repeated DemoOrderInfo demo_order_list = 2;
+}
+
+message updateDemoOrderPaidReq {
+  uint64 id = 1;
+  uint64 pay_order_id = 2;
+}
+
+message updateDemoRefundPaidReq {
+  uint64 id = 1;
+  uint64 pay_refund_id = 2;
+}
+
+message RefundDemoOrderReq {
+  uint64 id = 1;
+  string user_ip = 2;
+}
+
+// ---------- service ----------
+service Pay {
+  rpc initDatabase(Empty) returns (BaseResp);
+
+  rpc createDemoOrder(PayDemoOrderCreateReq) returns (BaseIDResp);
+  rpc getDemoOrder(IDReq) returns (DemoOrderInfo);
+  rpc getListDemoOrder(DemoOrderPageReq) returns (DemoOrderListResp);
+  rpc updateDemoOrderPaid(updateDemoOrderPaidReq) returns (BaseResp);
+  rpc refundDemoOrder(RefundDemoOrderReq) returns (BaseResp);
+  rpc updateDemoRefundPaid(updateDemoRefundPaidReq) returns (BaseResp);
+
+  rpc createOrder(OrderCreateReq) returns (BaseIDResp);
+  rpc getOrder(IDReq) returns (OrderInfo);
+  rpc getOrderPage(OrderPageReq) returns (OrderListResp);
+  rpc createOrderExtension(OrderCreateExtensionReq) returns (BaseIDResp);
+  rpc getOrderExtension(IDReq) returns (OrderExtensionInfo);
+  rpc notifyOrder(NotifyOrderReq) returns (BaseResp);
+  rpc submitPayOrder(OrderSubmitReq) returns (OrderSubmitResp);
+
+  rpc createRefund(RefundCreateReq) returns (BaseIDResp);
+  rpc getRefundPage(RefundPageReq) returns (RefundPageResp);
+  rpc getRefundById(IDReq) returns (RefundInfo);
+  rpc notifyRefund(NotifyRefundReq) returns (BaseResp);
+}
